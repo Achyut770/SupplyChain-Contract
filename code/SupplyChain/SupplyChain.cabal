@@ -33,7 +33,7 @@ common common-all
 
 library
   import:               common-all
-  hs-source-dirs:       lecture/on-chain
+  hs-source-dirs:       on-chain
   exposed-modules:      NFT
                         SupplyChain
 
