@@ -33,7 +33,7 @@ import PlutusTx.Prelude          ( Bool(..),
                                    traceIfFalse,
                                    ($),
                                    (.),
-                                   Eq(..)  , (+) , length)
+                                   Eq(..)  )
 import           Utilities        (wrapValidator)
 import           Prelude                    (IO , Show())
 import           Utilities            ( writeCodeToFile)
@@ -127,7 +127,6 @@ supplyChainValidator assetId dtm r ctx  =
                                                                                    photos dtm == photos outputDatums &&
                                                                                    currentOwner dtm == currentOwner outputDatums &&
                                                                                    owners dtm == owners outputDatums && 
-                                                                                   length (comments dtm) + 1 ==  length (comments outputDatums)  &&
                                                                                    checkComment
 
             checkComment :: Bool
@@ -141,7 +140,6 @@ supplyChainValidator assetId dtm r ctx  =
                                                                                             currentOwner dtm /= currentOwner outputDatums &&
                                                                                             currentOwner outputDatums == retrieveLast (owners outputDatums) && 
                                                                                             comments dtm == comments outputDatums &&
-                                                                                            length (owners dtm) + 1 ==  length (owners outputDatums)  &&
                                                                                             checkOwners
             
             checkOwners :: Bool

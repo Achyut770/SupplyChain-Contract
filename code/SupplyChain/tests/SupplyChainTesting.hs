@@ -4,6 +4,8 @@
 {-# LANGUAGE OverloadedStrings  #-}
 {-# OPTIONS_GHC -Wno-unused-matches #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use guards" #-}
 
 module Main where
 
@@ -44,7 +46,7 @@ main = defaultMain $ do
         good "-Successful comment with correct datum" $  testTransferAndCommentOfProductWithDatum SupplyChain.Comments  100 300 ["Photo1", "Photo2"] ["The product is really cool"],
         bad  "-Attempted comment with incorrect datum (expected failure) : Manufacture Date" $  testTransferAndCommentOfProductWithDatum SupplyChain.Comments  200 300 ["Photo1", "Photo2"] ["The product is really cool"],
         bad  "-Attempted comment with incorrect datum (expected failure) : ExpiryDate" $  testTransferAndCommentOfProductWithDatum SupplyChain.Comments  100 200 ["Photo1", "Photo2"] ["The product is really cool"],
-        bad  "-Attempted comment with incorrect datum (expected failure) : Photo"  $ testTransferAndCommentOfProductWithDatum SupplyChain.Comments  100 300 ["Photo1"] ["The product is really cool"],
+        bad  "-Attempted comment with incorrect datum (expected failure) : Photo"  $ testTransferAndCommentOfProductWithDatum SupplyChain.Comments  100 300 ["Photo1" ] ["The product is really cool"],
         bad  "-Attempted comment with incorrect datum (expected failure) : Commemnts" $  testTransferAndCommentOfProductWithDatum SupplyChain.Comments  100 300 ["Photo1 , Photo2"] [],
         bad  "-Attempted comment with incorrect datum (expected failure) : Manufacturer" $  testCommentAndtransferOfProductWithCorrectIncorrectDatumWithUser SupplyChain.Comments True,
         bad  "-Attempted comment with incorrect datum (expected failure) : Owners"  $ testCommentAndtransferOfProductWithCorrectIncorrectDatumWithUser SupplyChain.Comments False,
@@ -58,7 +60,6 @@ main = defaultMain $ do
         bad msg = good msg . mustFail
         good = testNoErrors (adaValue 10_000_000_000) defaultBabbage
 
-
 type SupplyChainScript = TypedValidator SupplyChain.SupplyChainDatum SupplyChain.SupplyChainRedemer
 
 instance Eq SupplyChain.SupplyChainRedemer where
@@ -68,11 +69,10 @@ instance Eq SupplyChain.SupplyChainRedemer where
 
 supplyChainScript :: AssetClass -> SupplyChainScript
 supplyChainScript x = TypedValidator . toV2 $ SupplyChain.supplyChainCodeWithParams x
--- Set many users at once
+
 setupUsers :: Run [PubKeyHash]
 setupUsers = replicateM 2 $ newUser $ ada (Lovelace 1_000_000_000)
 
--- NFT Minting Policy's script
 nftScript :: TxOutRef -> TokenName -> TypedPolicy ()
 nftScript ref tn = TypedPolicy . toV2 $ NFT.nftPolicy ref tn
 
@@ -211,6 +211,6 @@ testCommentAndtransferOfProductWithCorrectIncorrectDatumWithUser red forManufact
   submitTx u1 tx
   utxos <- utxoAt script
   let [(ref, out)] = utxos
-  let tx' = if forManufacturer then if red ==SupplyChain.Transfer then consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u2 [u1] [] ref (txOutValue out) else consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u2 [u1] ["The product Is good"] ref (txOutValue out) 
+  let tx' = if forManufacturer then if red ==SupplyChain.Transfer then consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u2 [u1 ] [] ref (txOutValue out) else consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u2 [u1] ["The product Is good"] ref (txOutValue out) 
                  else if  red ==SupplyChain.Transfer then  consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u1 [u1 , u2] [] ref (txOutValue out) else  consumingTx u1 script red u1 100 300 ["Photo1 , Photo2"] u1 [u1 , u2] ["The product is good"] ref (txOutValue out)
   submitTx u1 tx'
