@@ -153,9 +153,6 @@ mkWrappedValidator cs tn = wrapValidator . supplyChainValidator $ AssetClass  (u
 supplyChainCodeWithOutParams :: PlutusTx.CompiledCode (BuiltinData -> BuiltinData  -> BuiltinData -> BuiltinData -> BuiltinData -> ())
 supplyChainCodeWithOutParams = $$(compile [|| mkWrappedValidator ||])
 
-supplyChainCodeWithOutParamsAssetClass :: PlutusTx.CompiledCode (BuiltinData -> BuiltinData  -> BuiltinData -> BuiltinData -> BuiltinData -> ())
-supplyChainCodeWithOutParamsAssetClass = $$(compile [|| mkWrappedValidator ||])
-
 supplyChainCodeWithParams :: AssetClass -> Validator
 supplyChainCodeWithParams assets = mkValidatorScript   $ supplyChainCodeWithOutParams  `applyCode` liftCode   (toBuiltinData    x)   `applyCode` liftCode  ( toBuiltinData  y)
                               where
